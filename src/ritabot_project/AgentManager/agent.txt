@@ -1,0 +1,22 @@
+{"tag": "entitys_1",
+"patterns": ["Is there a neptune pizza with medium size?","Is there a margherita pizza with small size?","Is there a greek pizza with medium size?"],
+"responses": ["yes, there are $NUMBER $SIZE sized $TYPE pizza"],
+"object": {
+"type": "simple",
+"value": {}
+},
+"entity": {
+"TYPE": {"value": ["neptune","greek","margherita"] , "prompt": "what is type?", },
+"SIZE": {"value":["small","medium","large"] , "prompt": "what is size?"},
+"NUMBER": {"value": true , "prompt": "how many?"},
+"TIME": {"value": false , "prompt": ""},
+"DATE": {"value": false , "prompt": ""},
+"COUNTRY": {"value":false , "prompt": ""},
+"EMAIL": {"value":false , "prompt": ""},
+"PHONE": {"value":false , "prompt": ""},
+"URL": {"value":false , "prompt": ""},
+"ZIPCODE": {"value":false , "prompt": ""},
+"PERSON": {"value":false , "prompt": ""}
+}
+
+}

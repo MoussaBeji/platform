@@ -1,0 +1,216 @@
+"_USER MANUAL": {
+"_date_update": "not required field, optional argument",
+"_date_create": "not required field, optional argument ",
+"_agent": "not required field, optional argument ",
+"_imageurl": "if image is not changed",
+"_imagestr": "if new image or image has been changed",
+"_functional URL": "_IP@:8000/api/bot/_agentID/intents/_intentID/ "
+},
+
+
+{
+    "id": 366,
+    "name": "modified by updated",
+    "agent": 116,
+    "date_create": "2020-02-03T11:55:24.858900Z",
+    "date_update": "2020-02-03T11:55:24.945027Z",
+    "question_set": [
+        {
+            "id": 716,
+            "name": "quels sont vos services marwa?",
+            "date_create": "2020-02-03T11:55:25.028584Z",
+            "date_update": "2020-02-03T11:55:25.028746Z",
+            "order": 1
+        },
+        {
+            "id": 717,
+            "name": "quels sont vos services abdelmonom",
+            "date_create": "2020-02-03T11:55:25.124128Z",
+            "date_update": "2020-02-03T11:55:25.124827Z",
+            "order": 1
+        }
+    ],
+    "block_response_set": [
+        {
+            "id": 218,
+            "is_complex": true,
+            "date_create": "2020-02-03T11:55:25.228490Z",
+            "date_update": "2020-02-03T11:55:25.228651Z",
+            "mixed_response_set": [
+                {
+                    "id": 167,
+                    "date_create": "2020-02-03T11:55:25.301679Z",
+                    "date_update": "2020-02-03T11:55:25.301964Z",
+                    "text_response_set": [
+                        {
+                            "id": 122,
+                            "name": "Merci de consulter notre site web updated :",
+                            "date_create": "2020-02-03T11:55:25.982045Z",
+                            "date_update": "2020-02-03T11:55:25.982377Z",
+                            "order": 5,
+                            "button_set": [
+                                {
+                                    "id": 481,
+                                    "name": "Géoxy_updated51",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T11:55:26.069481Z",
+                                    "date_update": "2020-02-03T11:55:26.069887Z"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 123,
+                            "name": "à bientot updated",
+                            "date_create": "2020-02-03T11:55:26.163134Z",
+                            "date_update": "2020-02-03T11:55:26.163591Z",
+                            "order": 7,
+                            "button_set": [
+                                {
+                                    "id": 482,
+                                    "name": "Géoxy_updated50",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T11:55:26.255092Z",
+                                    "date_update": "2020-02-03T11:55:26.255618Z"
+                                }
+                            ]
+                        }
+                    ],
+                    "gallery_set": [
+                        {
+                            "id": 81,
+                            "date_create": "2020-02-03T11:55:26.344174Z",
+                            "date_update": "2020-02-03T11:55:26.344564Z",
+                            "order": 2,
+                            "slider_set": [
+                                {
+                                    "id": 96,
+                                    "imagestr": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAkFBMVEUDXGf////p6ekAVmIAUFzu7e0AWmais7fW3d6DnaK8yszL1dcATlsAU18AV2MAT1tijZTH19mbtrpXh48ha3WswsXY4+VLgIjP3d+1yczw9faUsbbm7/AASleGp6w4dH2AoqhslZtBeYF6mZ6NrLEFY24ucXuZtLh1lZvh5eVokpnG0dKCo6leiI/g6uukvcAEOuwEAAAKeElEQVR4nO2daWPiLBDHoSGsukA8ovGqR7xat63f/9s9icfjBcmQBBOy+3/TN7bl58AM5wzCxvXTaB3WzXaw9dFFvh+2V7PuaPhj/t8jk3982P8K0LvHCHccQSm6ERXC4ZyxdydcHIZjg40wRTg4fGyYxx2B0kSdCBS1d0NDLTFBONgFXgRHU+FuJCLM7axjoDVFE45He+7xdMvJrcm84FD00CyUcHwIGclGd7Wl508KhSyOcNwPGdfqmSpTcraZTAtrV1GEnTYjReD9DxmOCmpZIYTj7sbL1zmfJYizKKS3FkD4sySF9M4nOSwowLnmJhwGzDGBd5Rg29ydNSdhJ2RFd897UbLpl0honO/MmMuOOQgHwQv4Tox+jvGYmXC8LNx9JjB64eDVhDtuzr/IJLxlxgVINsKOT17KF8sR2VxOFsLxnhmJf2liYZYpQAbCEX1tB71KkMkLCMftcgx4Eplrm1GXsIPKMuBJgnTNEi68Eg14EuvpOVUtwumcl80XyUFa8V+H8I94XYxPEvV0HI4G4ZqVjXYRJW0ThN+vD/JqcR+8zQElnG6rMASvEhQ6GIGEA1SNIXgVJcBJHIywY2abIp+A/gZE2K+Mj7mTtyiKsFtNwGgOty+GcFLmRDRZkKiRTjirqgVj8XTEVMKZVzZFovh3XsJdtQEBVkwhrKyTuSrN3SQTVjRM3IusshN2qjQVVYutsxIOqjiTkYklTeASCMfIEsAIMWEankC4rdpkWy0q1IspNWG7WsulZAlfn3Bigxu9yunpEnaqHukfRVQOVUE4FtZ4mYs8hbdREIb2eJmLKJXvo8oJZ3aE+ns5AZywY5eXuYjswIQb6wbhSUR2UCwjXNoUCW9FZVFRQmhpH43FZyBCW/toJMqe++kz4crWPhpLzNMJh/b20VjPB6hPhHN7++hR/DHuPxIebIz1t3Iet20eCMfJszXhmDzFp9GfT7//LlI+4w0TCRfJbuajudpoNhsqwWn40WyuApR824oum00/CZHOkwiniRv4vO+67h8j3VjwduvNPenPKqGnOJPoE41EO7BRAmE78esjLffN/W2AkJKg4bpvZ7nu51Lp0Pmv6HONZCtv1ISD5EhhjJBPrnwnyJZqfQogROSgJOwl+xlThKR/zxcjNhQbfRBChFSEg5SdC0OE5PAEGCPKxxqI8M6It4QpJjRE6HxIACPEvvQfwWxI5YQ/afM1QzaU8cWIgewLhxHe3mK4Idyn/p4JwsjLKAil/wlow42McJy6f2iEUHwqbPjmyqbIMELEWhLCWeqqyQSh+FaYMCLcSVoEJKShhDB9/9AEobKTxt00OyHyBk+Ectd1JxOE5I+S8O0tB6GzfCLcpq8LjdjwtxrQlX0eSIjI+IEwLdoff+nVhJJ1DJiQHx4IF5CvxQRhwxAh3T4QQla2rx6Hbo5xePU1Z8IWpN1GbNhVE+bxpZGvmd0RtiFnTUbi4V4dLX7lIrysMM4/QK+UzcxL1Z1UNjHVIDxv2JwIR6Bmm5mXPi8Oz2rI3LsGofN1QwjqpGYIqa+aeUsbpdNL0Q0hrNVmeilfy9eHLeliTofwdIhxJATe7jJDSKUBw/2Uf1qHkE/+J4SEe2RsBUxR43mf5s2XDxwdwlPQPxICz9NM7URR0XpAdBsKQL1xyMZnwinwuMnYbiIii7cbRtftKu8MahGS0ZkQFitMEiIHrT/PW97u58FXL8a1CJ3VmfAD+pWYI4yazuerXb/f/Qp40qVPLcLjdk1MCG2EUcJjwqhIDk10ClqEiE2PhNBhaJoQJD1C0joSgtYVp8/bRhivLyLCNfRqgn2E8VliRCjdW5bJPkLEjoTg2yU2Eg4iQrCjsZEwcjUIw5tsISFfR4TdOvdS0Y4IVxomt44wmtUgjQvPFhKi94gQfqPbRkI2Rfgd/GkrCRvoB/6wwkZCMkIaty1tJORdpHGLy0ZCZ40O8CvBNhKKDzSpNyHtoZnGqLWRcI5W9Y6HyEewI4ujrCREKIDfXP9H+AplINR4fWApoZ/+kYv+Eb5C/wgl+kd4I0sJ6+9Lw9oT1j/i139eWv+1Rf3Xh/Vf49d9n2aFwGfcdhI6679gv7Tue96tv+DcAtd7ThOfPdX//LD+Z8D1P8eHJ7i0kPB4F6P+92nqfSfq5++411bnu4nhkRB8zm0f4fl+af3vCIPTl9lHeL7njZdVuKsPVLa7+hV4bwFWtvcW5b+ZgUvvzUyrIu+edJTt3RMG7ijaRnjzdg2Y7dI2wpv3h6W+IdVTxjekeF/eO2BNZX0HXOJbbk1lfcuNQcVyLCO8e49fXk4FXWXOqQDayrCLkN/nxQDd2LeLkP3cE36VlJ9GV9nz05SVY0hX8CxK/QdCSP5guwjxIyEgJPI4hWOj3FzROXJ9AXzNMR/Qpx02ZM/52gBbbk4zTnxQbsp2IKGQ5dxLz5soguivu9+lFveA5k3sSAgh2zXqvDGvEjD35U2RhNv8paDkl5ERy0y8nyt/aWoO2lM3fXOXjIvk3A7mBCK8ywatk0c4fut2RGysv7f+hpqWjCNfHuF0I17SAR2zrChSdBWmzNk97xN63+fzTjUi3TxnPDKHKGkAKJ93X0mYnkoYUbEzb70LYbbMkA/VZh7y6gMmLNxf/3ZfIwkIIK++l5RXH5BMOPqOOEdhu2le0qNbum+uEqdVN9MZGSH0/tCxFIVpyduSVmPDGyQTAtIJV1vXRYWCEM/tqyl3JyetzgxosV9h3Vd+kBLilEIs1Rak3pPlNbt+IITWFei8Slaqs1a188RWQlOv+ofPfVRBOLSznz7XXFMS4rWNcV9RErhGtWSRTi1Zm6qOn0U16wHjDujMtEJiEwWJsi73zq5Kj7ytAlHXVt/bFBWlkTCN0KZVBqXTLIRjewI/GaoxEgjxIL2gZDX0UPEQTqjxFKNUMWk9bhAhHtngUNkikSGZEB+qj0iWyQgphLhbdUR1IAQSVh0xFTCdsNqI6YAAwiojknRACGF13Q1bAloPIcQjULGkl4t9QRoPIsSdKs5umHTTIiMhHmyqNg2nJGmqpk+Ix/NqLaYESphsZyLEuF2lVT/fqpdLmQnxpDqIDBAlMhDiDq3GYKRAH6NPiMdhFZZTzgY6BPUJMZ6V31O9nnxftCBC3NmU61MFfzoCLZgQ432ZZiSh7PClYELcQmWZUcjPXgonxHjllWJGLwAHwbyEeLh9vVPlFDhNK4QwWlE5r+2qwlvoudDchHi88l4X/6kXaHuY3IQY//RexEjJVnFyZpgwGo4BM89IiZ9tABZB+AJGyvLx5SaM1sY9ppVNVEuCzVt5G5ibEOPpgiRVncwuznpac2xjhJEOfuGGFETMsgT4JxVDGA3IJSHFjUjKWZC7e55VFGGkUcB4EZARnn/IGN4lKpAwmgX0A0bydVcR4e0yR3eZCiWMNG4tRVZTRsYjvX4hg+9GRRPGGhy+OeNam8hUcI+FkwJc55NMEMYa9Fc+8wgXqZzCieA2y4MJulimCI8ajNbtzXsMyp371240fs7ACfPeUfDVHxbnV55llPCk6eBPfzJb9kL/UofB98Ng31wfWsNCfYpc/wHfj79xLPuTSgAAAABJRU5ErkJggg==",
+                                    "title": "Notre solution d'intelligence artificielle Magixy1 4",
+                                    "subtitle": "La qualité du service client conditionne l’image d’une entreprise et sa capacité",
+                                    "url": "http://www.solixy.com/",
+                                    "date_create": "2020-02-03T11:55:26.424661Z",
+                                    "date_update": "2020-02-03T11:55:26.426588Z",
+                                    "order": 1,
+                                    "button_set": []
+                                },
+                                {
+                                    "id": 97,
+                                    "imageurl": "http://127.0.0.1:8000/media/upoloads/image/58fffbe5-132d-4646-9bbd-4cadc9ede03c.png",
+                                    "title": "Notre solution d'intelligence artificielle Ritabot",
+                                    "subtitle": "Un agent conversationnel basé sur les technique de NLP (Natural Language Process",
+                                    "url": "http://www.solixy.com/",
+                                    "date_create": "2020-02-03T11:55:26.519146Z",
+                                    "date_update": "2020-02-03T11:55:26.520276Z",
+                                    "order": 2,
+                                    "button_set": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": 82,
+                            "date_create": "2020-02-03T11:55:26.607494Z",
+                            "date_update": "2020-02-03T11:55:26.607944Z",
+                            "order": 4,
+                            "slider_set": [
+                                {
+                                    "id": 98,
+                                    "imageurl": "http://127.0.0.1:8000/media/upoloads/image/7efa3cb0-941b-4e3c-9388-a43a028873b4.png",
+                                    "title": "Notre solution d'intelligence artificielle Geoxy",
+                                    "subtitle": null,
+                                    "url": null,
+                                    "date_create": "2020-02-03T11:55:26.689773Z",
+                                    "date_update": "2020-02-03T11:55:26.690634Z",
+                                    "order": 1,
+                                    "button_set": [
+                                        {
+                                            "id": 483,
+                                            "name": "Géoxy",
+                                            "url": null,
+                                            "payload": "Géoxy",
+                                            "date_create": "2020-02-03T11:55:26.776116Z",
+                                            "date_update": "2020-02-03T11:55:26.776417Z"
+                                        },
+                                        {
+                                            "id": 484,
+                                            "name": "RITABOT",
+                                            "url": null,
+                                            "payload": "",
+                                            "date_create": "2020-02-03T11:55:26.852673Z",
+                                            "date_update": "2020-02-03T11:55:26.853161Z"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "quick_reply_set": [
+                        {
+                            "id": 170,
+                            "name": "Ceci est un text de la réponse rapide 4.",
+                            "date_create": "2020-02-03T11:55:25.458715Z",
+                            "date_update": "2020-02-03T11:55:25.459001Z",
+                            "order": 1,
+                            "button_set": [
+                                {
+                                    "id": 477,
+                                    "name": "Géoxy_updated5",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T11:55:25.536272Z",
+                                    "date_update": "2020-02-03T11:55:25.536569Z"
+                                },
+                                {
+                                    "id": 478,
+                                    "name": "RITABOT",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T11:55:25.612579Z",
+                                    "date_update": "2020-02-03T11:55:25.612886Z"
+                                },
+                                {
+                                    "id": 479,
+                                    "name": "RITABOT add in update",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T11:55:25.722653Z",
+                                    "date_update": "2020-02-03T11:55:25.723190Z"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 171,
+                            "name": "Ceci est un text de la réponse rapide 5.",
+                            "date_create": "2020-02-03T11:55:25.800929Z",
+                            "date_update": "2020-02-03T11:55:25.801269Z",
+                            "order": 3,
+                            "button_set": [
+                                {
+                                    "id": 480,
+                                    "name": "Magixy add in update",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T11:55:25.891413Z",
+                                    "date_update": "2020-02-03T11:55:25.891796Z"
+                                }
+                            ]
+                        }
+                    ],
+                    "image_set": [
+                        {
+                            "id": 240,
+                            "date_create": "2020-02-03T11:55:25.378310Z",
+                            "date_update": "2020-02-03T11:55:25.378903Z",
+                            "order": 65,
+                            "imageurl": "http://127.0.0.1:8000/media/upoloads/image/c4d30647-80a7-40e5-a587-deb3e6091794.png"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "output_context_set": [],
+    "input_context_set": []
+}
+

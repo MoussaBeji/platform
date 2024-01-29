@@ -1,0 +1,193 @@
+"_USER MANUAL": {
+"_date_update": "not required field, optional argument",
+"_date_create": "not required field, optional argument ",
+"_agent": "not required field, optional argument ",
+"_functional URL": "_IP@:8000/api/bot/_agentID/intents/ "
+},
+
+
+{
+    "name": "modified by updated",
+    "agent": 116,
+    "date_create": "2020-02-03T09:25:02.870619Z",
+    "date_update": "2020-02-03T09:25:02.964598Z",
+    "question_set": [
+        {
+            "name": "quels sont vos services marwa?",
+            "date_create": "2020-02-03T09:25:03.023439Z",
+            "date_update": "2020-02-03T09:25:03.023635Z",
+            "order": 1
+        },
+        {
+            "name": "quels sont vos services abdelmonom",
+            "date_create": "2020-02-03T09:25:03.023439Z",
+            "date_update": "2020-02-03T09:25:03.023635Z",
+            "order": 1
+        }
+    ],
+    "block_response_set": [
+        {
+            "is_complex": true,
+            "date_create": "2020-02-03T09:25:03.194414Z",
+            "date_update": "2020-02-03T09:25:03.194613Z",
+            "mixed_response_set": [
+                {
+                    "date_create": "2020-02-03T09:25:03.254472Z",
+                    "date_update": "2020-02-03T09:25:03.254681Z",
+                    "text_response_set": [
+                    	 {
+                                    "name": "Merci de consulter notre site web updated :",
+                                    "date_create": "2020-01-31T12:17:44.745883Z",
+                                    "date_update": "2020-01-31T12:17:44.746297Z",
+                                    "order": 5,
+                                    "button_set": [
+                                    	{
+                                    "name": "Géoxy_updated51",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T09:25:03.489872Z",
+                                    "date_update": "2020-02-03T09:25:03.490112Z"
+                                }
+                                    	]
+                                },
+                                {
+                                    "name": "à bientot updated",
+                                    "date_create": "2020-01-31T12:17:44.828810Z",
+                                    "date_update": "2020-01-31T12:17:44.829302Z",
+                                    "order": 7,
+                                    "button_set": [
+                                    	{
+                                    "name": "Géoxy_updated50",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T09:25:03.489872Z",
+                                    "date_update": "2020-02-03T09:25:03.490112Z"
+                                }
+                                    	]
+                                }
+                    	],
+                    "gallery_set": [
+
+                    	{
+                                    "date_create": "2020-01-31T12:17:44.912474Z",
+                                    "date_update": "2020-01-31T12:17:44.913115Z",
+                                    "order": 2,
+                                    "slider_set": [
+                                        {
+                                            "imagestr": "data:image/png;base64,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",
+                                            "title": "Notre solution d'intelligence artificielle Magixy",
+                                            "subtitle": "La qualité du service client conditionne l’image d’une entreprise et sa capacité",
+                                            "url": "http://www.solixy.com/",
+                                            "date_create": "2020-01-31T12:17:44.998656Z",
+                                            "date_update": "2020-01-31T12:17:45.000166Z",
+                                            "order": 1,
+                                            "button_set": []
+                                        },
+                                        {
+                                            "imagestr": "data:image/png;base64,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",
+                                            "title": "Notre solution d'intelligence artificielle Ritabot",
+                                            "subtitle": "Un agent conversationnel basé sur les technique de NLP (Natural Language Process",
+                                            "url": "http://www.solixy.com/",
+                                            "date_create": "2020-01-31T12:17:45.087214Z",
+                                            "date_update": "2020-01-31T12:17:45.088450Z",
+                                            "order": 2,
+                                            "button_set": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "date_create": "2020-01-31T12:17:45.185399Z",
+                                    "date_update": "2020-01-31T12:17:45.186061Z",
+                                    "order": 4,
+                                    "slider_set": [
+                                        {
+                                            "imagestr": "data:image/png;base64,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",
+                                            "title": "Notre solution d'intelligence artificielle Geoxy",
+                                            "subtitle": null,
+                                            "url": null,
+                                            "date_create": "2020-01-31T12:17:45.266808Z",
+                                            "date_update": "2020-01-31T12:17:45.267612Z",
+                                            "order": 1,
+                                            "button_set": [
+                                                {
+                                                    "name": "Géoxy",
+                                                    "url": null,
+                                                    "payload": "Géoxy",
+                                                    "date_create": "2020-01-31T12:17:45.410177Z",
+                                                    "date_update": "2020-01-31T12:17:45.410661Z"
+                                                },
+                                                {
+                                                    "name": "RITABOT",
+                                                    "url": null,
+                                                    "payload": "",
+                                                    "date_create": "2020-01-31T12:17:45.503850Z",
+                                                    "date_update": "2020-01-31T12:17:45.504079Z"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+
+
+                    	],
+                    "quick_reply_set": [
+                        {
+                            "name": "Ceci est un text de la réponse rapide 4.",
+                            "date_create": "2020-02-03T09:25:03.413229Z",
+                            "date_update": "2020-02-03T09:25:03.413609Z",
+                            "order": 1,
+                            "button_set": [
+                                {
+                                    "name": "Géoxy_updated5",
+                                    "url": null,
+                                    "payload": "Géoxy",
+                                    "date_create": "2020-02-03T09:25:03.489872Z",
+                                    "date_update": "2020-02-03T09:25:03.490112Z"
+                                },
+                                {
+                                    "name": "RITABOT",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T09:25:03.565688Z",
+                                    "date_update": "2020-02-03T09:25:03.566189Z"
+                                },
+                                {
+                                    "name": "RITABOT add in update",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T09:25:03.565688Z",
+                                    "date_update": "2020-02-03T09:25:03.566189Z"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Ceci est un text de la réponse rapide 5.",
+                            "date_create": "2020-02-03T09:25:03.643229Z",
+                            "date_update": "2020-02-03T09:25:03.643642Z",
+                            "order": 3,
+                            "button_set": [
+                            	  {
+                                    "name": "Magixy add in update",
+                                    "url": null,
+                                    "payload": "RITABOT",
+                                    "date_create": "2020-02-03T09:25:03.565688Z",
+                                    "date_update": "2020-02-03T09:25:03.566189Z"
+                                }
+                            	]
+                        }
+                    ],
+                    "image_set": [
+                        {
+                            "date_create": "2020-02-03T09:25:03.331692Z",
+                            "date_update": "2020-02-03T09:25:03.332858Z",
+                            "order": 65,
+                            "imagestr": "data:image/png;base64,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"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "output_context_set": [],
+    "input_context_set": []
+}

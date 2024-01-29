@@ -1,0 +1,17 @@
+pandas==1.0.3
+spacy==2.2.4
+nltk==3.4
+numpy==1.16.2
+tflearn==0.3.2
+tensorflow==1.13.1
+pyenchant==2.0.0
+fuzzywuzzy==0.17.0
+Flask==1.0.2
+Flask-Cors==3.0.3
+pygeoip==0.3.2
+python-crontab==2.4.0
+phonenumbers==8.11.4
+pycountry==19.8.18
+dateparser==0.7.4
+Flask-Limiter==1.2.1
+

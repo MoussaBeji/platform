@@ -1,0 +1,21 @@
+
+{"URL": "http://127.0.0.1:8000/api/stats/118/analytics/",
+"Method":  "POST"},
+
+
+{       "sessionID": "FR145DERF080",
+        "chaine": "Facebook",
+        "adresseIP": "Inconnue",
+        "country": "Inconnue",
+        "platform": "Inconnue",
+        "browser": "Inconnue",
+        "agentStats": [
+            {
+                "inputMsg": "None",
+                "outputRate": "0.9",
+                 "intentName": "autre"
+            }
+        ]
+}
+
+

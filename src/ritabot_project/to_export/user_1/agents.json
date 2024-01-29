@@ -1,0 +1,296 @@
+{
+    "Agents": [
+        {
+            "name": "S-comme solaire",
+            "description": "S-comme solaire",
+            "language": "Dialecte tunisien",
+            "time_zone": "GMT + 1",
+            "imageName": "65ca9c88-115d-4837-b24f-75046046cbc0.png",
+            "port": 8161,
+            "status": "En marche",
+            "is_main": true,
+            "is_default": false,
+            "intent_set": [
+                {
+                    "name": "Debut de discution",
+                    "description": "Intent de debut de discution. Message de Bienvenue",
+                    "is_active": true,
+                    "is_none_response": false,
+                    "is_depart": true,
+                    "question_set": [
+                        {
+                            "name": "97b7c09ed472cd10882de674559282dcb7e5c471",
+                            "order": 1
+                        }
+                    ],
+                    "block_response_set": [
+                        {
+                            "is_complex": false,
+                            "simple_response_set": [
+                                {
+                                    "random_text_set": [
+                                        {
+                                            "name": "Pas de reponse specifique. Cette reponse est automatique",
+                                            "order": 1
+                                        }
+                                    ]
+                                }
+                            ],
+                            "mixed_response_set": []
+                        }
+                    ],
+                    "output_context_set": [],
+                    "input_context_set": []
+                },
+                {
+                    "name": "Debut de discution facebook",
+                    "description": "Intent de debut de discution pour facebook. Message de Bienvenue",
+                    "is_active": true,
+                    "is_none_response": false,
+                    "is_depart": true,
+                    "question_set": [
+                        {
+                            "name": "58108524103242b03af9d44b72dd6b6c9280072e 140ccda42adea5f48c8a617171f3f21d61f6454f",
+                            "order": 1
+                        }
+                    ],
+                    "block_response_set": [
+                        {
+                            "is_complex": false,
+                            "simple_response_set": [
+                                {
+                                    "random_text_set": [
+                                        {
+                                            "name": "Pas de reponse specifique. Cette reponse est automatique pour facebook",
+                                            "order": 1
+                                        }
+                                    ]
+                                }
+                            ],
+                            "mixed_response_set": []
+                        }
+                    ],
+                    "output_context_set": [],
+                    "input_context_set": []
+                },
+                {
+                    "name": "Intent de reponse d'erreur",
+                    "description": "Intent de reponse d'erreur. Ce message est apparu quand le bot ne trouve pas une reponse pour une tel question",
+                    "is_active": true,
+                    "is_none_response": true,
+                    "is_depart": false,
+                    "question_set": [
+                        {
+                            "name": "e619abf36bd80410b3854c9573fdc63f94a5a942",
+                            "order": 1
+                        }
+                    ],
+                    "block_response_set": [
+                        {
+                            "is_complex": false,
+                            "simple_response_set": [
+                                {
+                                    "random_text_set": [
+                                        {
+                                            "name": "yyyyyyyyyyyyyyyyy",
+                                            "order": 1
+                                        }
+                                    ]
+                                }
+                            ],
+                            "mixed_response_set": []
+                        }
+                    ],
+                    "output_context_set": [],
+                    "input_context_set": []
+                },
+                {
+                    "name": "Intent de ponderation",
+                    "description": "Intent de reponse d'erreur. Ce message est apparu quand le bot ne trouve pas une reponse pour une tel question",
+                    "is_active": false,
+                    "is_none_response": false,
+                    "is_depart": false,
+                    "question_set": [
+                        {
+                            "name": "adc86edc47eba203cc4e1358e7a1f53d2705a263",
+                            "order": 1
+                        }
+                    ],
+                    "block_response_set": [
+                        {
+                            "is_complex": false,
+                            "simple_response_set": [
+                                {
+                                    "random_text_set": [
+                                        {
+                                            "name": "Pas de reponse specifique. Cette reponse est automatique. Vous devez specifier la reponse que vous convienne ici",
+                                            "order": 1
+                                        }
+                                    ]
+                                }
+                            ],
+                            "mixed_response_set": []
+                        }
+                    ],
+                    "output_context_set": [],
+                    "input_context_set": []
+                },
+                {
+                    "name": "PP",
+                    "description": "pp",
+                    "is_active": true,
+                    "is_none_response": false,
+                    "is_depart": false,
+                    "question_set": [
+                        {
+                            "name": "قداش تتكلف ال5.5 زوايل على عمق 80 وقداش من بانو وفم تقسيط والا لا",
+                            "order": 13
+                        },
+                        {
+                            "name": "Svp devis pompe 7,5 et type de variateur et origin plaque 55423897",
+                            "order": 32
+                        },
+                        {
+                            "name": "بالله بقداش طاقة لطرمبة 10خيالي ودفاف 7.5 يخدمو في نفس الوقت",
+                            "order": 31
+                        },
+                        {
+                            "name": "9dech esoum t5adem 3 weld 4 5ayeli",
+                            "order": 30
+                        },
+                        {
+                            "name": "Brabi pompe 3 cheval gedah test7a9 men carré solaire",
+                            "order": 29
+                        },
+                        {
+                            "name": "Pompe 7 cc 4 pousse combien le coût d Energie Solaire",
+                            "order": 28
+                        },
+                        {
+                            "name": "عندي بءر عميق قنوني ترمبة5.5 بقداش تكلفة 380 وشكرا",
+                            "order": 27
+                        },
+                        {
+                            "name": "طاقة 3.5 بقدا بالتقسيط والنوعية",
+                            "order": 26
+                        },
+                        {
+                            "name": "بقداش 5,5 وقداش من بلاكة تركب",
+                            "order": 25
+                        },
+                        {
+                            "name": "انا فلاح عندي 250 نخله في منطقه سقدود نحب نعمل طاقه كيفاش نجم نتصل",
+                            "order": 24
+                        },
+                        {
+                            "name": "نحب نعمل طاقه شمسيه تخدم مضخه 3 chovo",
+                            "order": 23
+                        },
+                        {
+                            "name": "Slt blhi 3andi pompe emergėe mta3 sondage 3 cheveau enjim nrakbilha ou nn ? Welprix slt",
+                            "order": 22
+                        },
+                        {
+                            "name": "32 kw (40kva) prix??? SVP",
+                            "order": 21
+                        },
+                        {
+                            "name": "تكلفة تجهيز بئر عميقة عمق 120 متر",
+                            "order": 20
+                        },
+                        {
+                            "name": "قداش التكلفة متاع طرمبة 15زايلة مع الشكر",
+                            "order": 19
+                        },
+                        {
+                            "name": "كم تساوي محطة لضخ الماء(فلاحي)",
+                            "order": 18
+                        },
+                        {
+                            "name": "Est il possible d'installer le photovoltaique pour alimenter une pompe electrique de 2cv a 45 metres de pofondeur et une lance de 2cv devis svp",
+                            "order": 17
+                        },
+                        {
+                            "name": "بڨداش 16paneaux",
+                            "order": 16
+                        },
+                        {
+                            "name": "طاقة 3.5 بقدا بالتقسيط والنوعية",
+                            "order": 15
+                        },
+                        {
+                            "name": "طاقة5 , 3 بقداش. 23211481",
+                            "order": 14
+                        },
+                        {
+                            "name": "كيفاش.اتسهيل.5. خيالي",
+                            "order": 12
+                        },
+                        {
+                            "name": "Prix SVP pour 3 chevaux",
+                            "order": 11
+                        },
+                        {
+                            "name": "لو سمحت التكلفة لمضخة 5 ، 5 زوايل",
+                            "order": 10
+                        },
+                        {
+                            "name": "انا عندي بير ونحب نركب الطاقة الشمسية في قفصة",
+                            "order": 9
+                        },
+                        {
+                            "name": "السلام عليكم، نحب على طاقة شمسية تخدم 7 زوايل، قداش تتكلف، و شكرا",
+                            "order": 8
+                        },
+                        {
+                            "name": "طاقة شمسية نتاع 7.5chكم ثمنها وهل يوجد بالقسيط",
+                            "order": 7
+                        },
+                        {
+                            "name": "بقداش تتكلف الطاقة الشمسية لزوز موتورات دفاف و طرمبة 11 زائلة",
+                            "order": 6
+                        },
+                        {
+                            "name": "كيفاش.اتسهيل.5. خيالي",
+                            "order": 5
+                        },
+                        {
+                            "name": "3 خيالي قداش تتكلف ",
+                            "order": 4
+                        },
+                        {
+                            "name": "3زوايل بقداش بلبطرية",
+                            "order": 3
+                        },
+                        {
+                            "name": "7.5 بقداش",
+                            "order": 2
+                        },
+                        {
+                            "name": "سلام خويا نحب نركب طرمبة 10زوايل قداش تتكلف و قداش تسبقة",
+                            "order": 1
+                        }
+                    ],
+                    "block_response_set": [
+                        {
+                            "is_complex": false,
+                            "simple_response_set": [
+                                {
+                                    "random_text_set": [
+                                        {
+                                            "name": "pp",
+                                            "order": 1
+                                        }
+                                    ]
+                                }
+                            ],
+                            "mixed_response_set": []
+                        }
+                    ],
+                    "output_context_set": [],
+                    "input_context_set": []
+                }
+            ]
+        }
+    ]
+}

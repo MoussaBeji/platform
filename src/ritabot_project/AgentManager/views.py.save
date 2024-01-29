@@ -1,0 +1,865 @@
+
+from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination, BasePagination
+from collections import OrderedDict, namedtuple
+from AgentManager import serializers, export_serializers
+from rest_framework.views import APIView, View
+from rest_framework import filters
+from rest_framework.exceptions import ValidationError
+
+from AgentManager.specific_intent import Francais, Anglais, TunisienDialecte
+
+"""     Response types        """
+from rest_framework.response import Response
+from django.http import HttpResponse
+from django.http import JsonResponse
+"""     Permissions and token import modules    """
+from rest_framework.authentication import TokenAuthentication
+from AgentManager import permissions
+from rest_framework.permissions import IsAuthenticated
+"""For images and files"""
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser, JSONParser
+from .training import *
+from .renderers import ZIPRenderer
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+import os
+import shutil
+import subprocess
+import socket
+from contextlib import closing
+from ritabot.settings import *
+from .models import *
+#image decoding
+import base64
+from django.core.files.base import ContentFile
+import zipfile
+
+
+"""CODING/DECODING"""
+
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+"""     Const   """
+IP_ADDRESS = urlServer
+EXPORT_FOLDER = "to_export"
+IMPORT_FOLDER = "to_import"
+
+
+"""     Define the pagination class for agent managment"""
+class StandardResultsSetPagination(PageNumberPagination, BasePagination):
+    page_size = 50
+    page_query_param="pageindex"
+    page_size_query_param = 'pagesize'
+    max_page_size = 1000
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('totalCount', self.page.paginator.count),
+
+            ('agentList', data)
+        ]))
+
+
+"""     Define the pagination class for intent managment"""
+class StandardIntentResultsSetPagination(PageNumberPagination, BasePagination):
+    page_size = 50
+    page_query_param="pageindex"
+    page_size_query_param = 'pagesize'
+    max_page_size = 1000
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('totalCount', self.page.paginator.count),
+
+            ('intentList', data)
+        ]))
+
+"""Agent status class"""
+class AgentStatusManager(APIView):
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.AgentStatusSerializer
+    permission_classes = (IsAuthenticated, permissions.AgentStatusPemissions)
+
+    def post(self, request, agentID):
+        try:
+            agent=Agent.objects.get(id=agentID)
+        except:
+            return Response({"erreur" : "agent not found"})
+        agent.status='entrainer'
+        agent.save()
+
+
+"""Agent managment class"""
+class AgentManager(viewsets.ModelViewSet):
+
+    parser_classes = (MultiPartParser, FormParser)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.AgentManagerSerializer
+    queryset = Agent.objects.all()
+    pagination_class = StandardResultsSetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    permission_classes = (IsAuthenticated, permissions.AgentPermissions)
+    #permission_classes = (IsAuthenticated, permissions.AgentPermissions)
+
+    def create(self, request, *args, **kwargs):
+
+        req=None
+        if request.data['image'] and type(request.data['image'])==str:
+            format, imgstr = request.data['image'].split(';base64,')
+            ext = format.split('/')[-1]
+            print('####image', request.data['image'])
+            print("extension",ext)
+            print("request.data",request.data)
+            imagefield= ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+            req=request.data.copy()
+            req['image']=imagefield
+
+        if req:
+            serializer = serializers.AgentManagerSerializer(data=req, context={'request': self.request})
+        else:
+            serializer = serializers.AgentManagerSerializer(data=request.data, context={'request': self.request})
+
+        if serializer.is_valid():
+            agent = serializer.save()
+            # self.context['agentid'] = agent.id
+            if "/agent/" in self.request.path:
+                if agent.language == "Francais":
+                    langue=Francais()
+
+                elif agent.language == "Dialecte tunisien":
+                    langue = TunisienDialecte()
+                #elif agent.language == "Anglais":
+                else:
+                    langue = Anglais()
+
+                serializer = serializers.IntentManagerSerializer(data=langue.getdepart(), context={'request': self.request, 'agentid': agent.id})
+                if serializer.is_valid():
+
+                    intentObj = serializer.save()
+                    intentObj.is_depart=True
+                    intentObj.save()
+
+                serializer = serializers.IntentManagerSerializer(data=langue.getnoresponse(), context={'request': self.request, 'agentid': agent.id})
+                if serializer.is_valid():
+                    intentObj = serializer.save()
+                    intentObj.is_none_response = True
+                    intentObj.save()
+
+                serializer = serializers.IntentManagerSerializer(data=langue.getdisabled(), context={'request': self.request, 'agentid': agent.id})
+                if serializer.is_valid():
+                    intentObj = serializer.save()
+                    intentObj.is_active = False
+                    intentObj.save()
+            return Response({"success": True})
+        return Response({"success": False})
+
+    def get_queryset(self):
+        if "/agent/" in self.request.path:
+            perm= UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+            agent= Agent.objects.filter(id__in =perm, is_default=False)
+            return (agent)
+        elif "/defaultagent/" in self.request.path:
+            perm = UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+            if self.request.user.is_superuser:
+                agent = Agent.objects.filter(id__in=perm, is_default=True)
+            else:
+                agent = []
+            return (agent)
+
+"""launch training class"""
+class LaunchTraining(APIView):
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    #TODO: Add permission class for launch training class
+
+    def post(self, request):
+        print(request.data)  # will receive agent_id
+        agent_id = request.data['agent_id']
+        try:
+            agent = Agent.objects.get(id=agent_id)
+        except(TypeError, ValueError, OverflowError, Agent.DoesNotExist):
+            return Response({"error":"This agent does not exist"})
+        json_response = dict()
+        json_response["success"] = "ok"
+        user_id = request.user.id
+        json_file = generate_json(user_id, agent_id)
+        if os.path.exists(json_file):
+            if agent.language == 'Francais':
+                lang='french'
+            if agent.language == 'Anglais':
+                lang = 'english'
+            if agent.language == 'Dialecte tunisien':
+                lang = 'tunisian'
+            agent.status = "in_training"
+            agent.save()
+            #cmd = "nohup " + "python3 " + " " + training_path + "main_trainer.py" + " "+ str(lang) + " " + str(user_id) + " " + str(agent_id) + " &"
+            cmd =  "python" + " " + training_path + "main_trainer.py" + " "+ str(lang) + " " + str(user_id) + " " + str(agent_id) 
+
+            os.system("{}".format(cmd))
+            # TODO to be changed by ahmed
+            print(cmd)
+
+            return Response(json_response)
+        else:  # error message to return to user
+            return Response(json_file)
+
+
+"""Test training class"""
+class TestTraining(APIView):
+    """
+    Test training of a specific agent
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    # TODO: Add permission class for launch training class
+    #TODO: Not yet Tested
+    def check_socket(self, host, port):
+
+        print("####HOST:",host)
+        print("####Port:",port)
+        ipwith=host.split('http://')[-1]
+        ip=ipwith.split('/')[0]
+
+        # host_name = socket.gethostname()
+        # ip_address = socket.gethostbyname(host_name)
+        # print("Host name: %s" % host_name)
+        # print("IP address: %s" % ip_address)
+        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+
+            if sock.connect_ex((ip, port)) == 0:  # port not available
+                return False
+            else:  # port available
+                return True
+
+    def post(self, request):
+        print(request.data)  # will receive agent_id
+        agent_id = request.data['agent_id']
+        #TODO: add exception handling
+        agent = Agent.objects.get(id=agent_id)
+        user = request.user
+        json_response = dict()
+        json_response["success"] = "ok"
+        user_id = request.user.id
+        #json_file = os.path.join(training_path,"data", "user_{}".format(user_id), "agent_{}".format(agent_id), "training_data_agent_{}.json".format(agent_id))
+
+        if agent.language == 'Francais':
+            lang = 'french'
+        if agent.language == 'Anglais':
+            lang = 'english'
+        if agent.language == 'Dialecte tunisien':
+            lang = 'tunisian'
+        #cmd = "nohup " + "python3 " +os.path.join(training_path, 'main_chatbot.py') + " " + str(lang) + " " + str(user_id) + " " + str(agent_id) + " " + str(agent.port) + " &"
+        x = self.check_socket(IP_ADDRESS, agent.port)
+        if x is False:
+            print(cmd)
+            print("Port {}: Not available".format(agent.port))
+            subprocess.call("kill $(lsof -t -i:" + str(agent.port) + ")", shell=True)
+        #     subprocess.call(cmd, shell=True)
+        # else:
+        #     subprocess.call(cmd, shell=True)
+        #os.system("xterm -e \"python christmaskittens.py\"")
+        #subprocess.call(cmd, shell=True)
+        agent.status = "En marche"
+        agent.save()
+        os.system("{}".format(cmd))
+        print(cmd)
+        #TODO to be changed by ahmed
+
+        return Response(json_response)
+
+"""Output context view"""
+class OutputContextManagerView(viewsets.ModelViewSet):
+    """Handle reading the output context"""
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.OutputContextSerializer
+    permission_classes = (IsAuthenticated,permissions.outContextpermissions)
+
+    def get_queryset(self):
+        perm= UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+        agentid= self.kwargs['agentid']
+        excludedIntentID= self.kwargs['intentid']
+        agent= Agent.objects.filter(id__in =perm, id=agentid).values('pk')
+        intent= Intent.objects.filter(agent__in =agent)
+        excludedIntent = Intent.objects.filter(id=excludedIntentID)
+        outputContext = OutputContext.objects.filter(intent__in=intent).exclude(intent__in=excludedIntent)
+        return (outputContext)
+
+"""Intent manager class"""
+class IntentManagerView(viewsets.ModelViewSet):
+    """Handle creating reading and updating intents"""
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.IntentManagerSerializer
+    permission_classes = (IsAuthenticated,permissions.IntentPermissions)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    pagination_class = StandardIntentResultsSetPagination
+    #TODO: add pagination like agent
+    def create(self, request, *args, **kwargs):
+        print(self.request.data)
+        verif={"success":True}
+        serializer = serializers.IntentManagerSerializer(data=self.request.data, context={'request': self.request, 'agentid': self.kwargs['agentid']})
+        if serializer.is_valid():
+            serializer.create(self.request.data)
+            return Response({"sucess":"ok"})
+        raise ValidationError(serializer.error_messages)
+
+    def update(self, request, *args, **kwargs):
+        serializer = serializers.IntentManagerSerializer(data=self.request.data, context={'request': self.request, 'agentid': self.kwargs['agentid']})
+        if serializer.is_valid():
+            instance = self.get_object()
+            serializer.update(instance, self.request.data)
+            return Response({"sucess":"ok"})
+        raise ValidationError(serializer.error_messages)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object().id
+        intent=self.get_object()
+        if intent.is_depart == True or intent.is_none_response == True:
+            raise Exception("Vous ne devez pas supprimer une intention de depart de discution ou de message d'erreur")
+        Intent.objects.filter(id=instance).delete()
+        agentID = self.kwargs['agentid']
+        agent = Agent.objects.get(id= agentID)
+        agent.status = "non entrainer"
+        agent.save()
+        return Response({"sucess":"ok"})
+
+    def get_queryset(self):
+        perm= UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+        agentid= self.kwargs['agentid']
+        agent= Agent.objects.filter(id__in =perm, id=agentid).values('pk')
+        intent= Intent.objects.filter(agent__in =agent, is_active=True)
+        return (intent)
+
+"""Add default intent manager class"""
+class AddDefaultIntentManagerView(viewsets.ModelViewSet):
+    """Handle creating default intents"""
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.AddDefaultIntentManagerSerializer
+    permission_classes = (IsAuthenticated,permissions.AddDefaultIntentManagerPermission)
+
+    def create(self, request, *args, **kwargs):
+
+        print(self.request.data)
+        verif={"success":True}
+        serializer = serializers.AddDefaultIntentManagerSerializer( data=self.request.data, context={'request': self.request, 'agentid': self.kwargs['agentid']})
+        if serializer.is_valid():
+            serializer.create(self.request.data)
+            return Response({"sucess":"ok"})
+        raise ValidationError(serializer.error_messages)
+
+    def get_queryset(self):
+
+        return ([])
+
+"""Default Intents manager class"""
+class DefaultIntentManagerView(viewsets.ModelViewSet):
+    """Handle creating reading and updating intents"""
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.IntentManagerSerializer
+    permission_classes = (IsAuthenticated,permissions.DefaultIntentsPermissions)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    pagination_class = StandardIntentResultsSetPagination
+
+
+    def get_queryset(self):
+        #perm= UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+
+        if 'tunisien' in self.kwargs['agentName']:
+            agentName = 'Dialecte tunisien'
+        else:
+            agentName = self.kwargs['agentName']
+        agent= Agent.objects.filter(name=agentName, is_default=True).values('pk')
+        intent= Intent.objects.filter(agent__in=agent)
+        return (intent)
+
+class AgentCustomerManager(viewsets.ModelViewSet):
+    """Handle the customer of the specifyed agent"""
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.AgentCustomerManagerSerializer
+    queryset = UserPermissions.objects.all()
+    permission_classes = (IsAuthenticated,permissions.UserManagePermissions)
+
+    def perform_create(self, serializer):
+        serializer = serializers.AgentCustomerManagerSerializer(data=self.request.data, context={'request': self.request, 'agentid': self.kwargs['agentid']})
+        if serializer.is_valid():
+            userPermissions = serializer.save(is_active=False)
+            return Response(serializer.data)
+
+        raise ValidationError(serializer.error_messages)
+
+    def get_queryset(self):
+        try:
+            perm= UserPermissions.objects.get(user_profile=self.request.user, agent=self.kwargs['agentid'])
+        except(TypeError, ValueError, OverflowError, UserPermissions.DoesNotExist):
+            raise Exception("Access denied")
+        return UserPermissions.objects.filter(agent=self.kwargs['agentid'])
+
+class InvitationManager(APIView):
+    #serializer_class = serializers.InvitationManagerSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, invitID):
+
+        decodedinvitID = force_text(urlsafe_base64_decode(invitID))
+        try:
+            userPermission = UserPermissions.objects.get(pk =decodedinvitID, user_profile=request.user.id)
+        except(TypeError, ValueError, OverflowError, UserPermissions.DoesNotExist):
+            return Response({'Invitation': 'Invalid action'})
+
+        userPermission.is_active=True
+        userPermission.save()
+        return Response({'Invitation': 'Invitation successfully accepted'})
+
+    def delete(self, request, invitID):
+
+        decodedinvitID = force_text(urlsafe_base64_decode(invitID))
+        try:
+            UserPermissions.objects.get(pk =decodedinvitID, user_profile=request.user.id).delete()
+        except(TypeError, ValueError, OverflowError, UserPermissions.DoesNotExist):
+            return Response({'Invitation': 'Invalid action'})
+
+        return Response({'Invitation': 'Invitation successfully deleted'})
+
+
+""" Export / Import / Restore with Serializer """
+
+
+class ExportIntentManager(APIView):
+    """
+    export_intents(intent_ids, path_to_user_folder)
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, permissions.ExportIntentPermissions)
+    renderer_classes = [ZIPRenderer, JSONRenderer, BrowsableAPIRenderer]
+    serializer_class = export_serializers.IntentManagerSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        {"list_ids":[intentID,...]}
+        """
+
+        try:
+            list_ids = request.data["intents_list"]
+        except:
+            return JsonResponse({"error": "Expected intents_list."})
+
+        if type(list_ids) != list:
+            return JsonResponse({"error": "Input expected to be list."})
+
+        if len(list_ids) > 0:
+
+            # 0) check if intent ids exist
+            # 1) check agent permissions
+            permissions = UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+            agents = Agent.objects.filter(id__in=permissions)
+            intents = Intent.objects.filter(agent__in=agents).order_by('-date_update').reverse()
+            intent_ids = [intent.id for intent in intents]
+            for intent_id in list_ids:
+                try:
+                    Intent.objects.get(id=intent_id)
+                except Intent.DoesNotExist:
+                    return JsonResponse({"error": "Intent with id " + str(intent_id) + " does not exist."})
+                if not intent_id in intent_ids:
+                    return JsonResponse({"error": "Vous n'avez pas les permissions requises pour pouvoir exporter le (ou les) intents demandé(s)"})
+
+            # 1) empty working directory to receive new exported data:
+            path_to_user_folder = os.path.join(EXPORT_FOLDER, 'user_{}').format(request.user.id)
+
+            if not os.path.exists(path_to_user_folder):
+                os.makedirs(path_to_user_folder)
+            else:
+                shutil.rmtree(path_to_user_folder)
+                os.makedirs(path_to_user_folder)
+
+            path = os.path.join(path_to_user_folder, "intents.json")
+
+            # 3) export intents
+            queryset = Intent.objects.filter(id__in=list_ids).order_by('-date_update').reverse()
+            serializer = self.serializer_class(queryset, many=True)
+            with open(path, 'w') as intents_file:
+                json.dump({"Intents": serializer.data}, intents_file, ensure_ascii=False, indent=4)
+
+            # 4) collect images related to intent
+
+            images_path = os.path.join(path_to_user_folder, 'images')
+            # create images folder if it does not exist
+            if not os.path.exists(images_path):
+                os.makedirs(images_path)
+
+            block_responses = BlockResponse.objects.filter(intent__in=queryset, is_complex=True)
+            print("block responses :", block_responses)
+            if len(block_responses) > 0:
+                print("yes got block responses")
+                mixed_responses = MixedResponse.objects.filter(block_response__in=block_responses)
+                print("mixed responses :", mixed_responses)
+                images_set = Image.objects.filter(mixed_response__in=mixed_responses)
+                print("image set :", images_set)
+                if len(images_set) > 0:
+                    for image in images_set:
+                        try:
+                            image_name = os.path.join(images_path, '{}').format(image.imagename())
+                            with open(image_name, 'wb') as actual_file:
+                                actual_file.write(image.image.read())
+                        except:
+                            pass
+                """ filtering sliders image """
+                gallery_set = Gallery.objects.filter(mixed_response__in=mixed_responses)
+                if len(gallery_set) > 0:
+                    slider_set = Slider.objects.filter(gallery__in=gallery_set)
+                    if len(slider_set) > 0:
+                        for slider in slider_set:
+                            try:
+                                image_name = os.path.join(images_path, '{}').format(slider.imagename())
+                                with open(image_name, 'wb') as actual_file:
+                                    actual_file.write(slider.image.read())
+                            except:
+                                pass
+
+            # 3) generate zip_file:
+            try:
+                shutil.rmtree(os.path.join(EXPORT_FOLDER, 'user_exported_{}').format(request.user.id))
+            except:
+                pass
+            shutil.make_archive(
+                os.path.join(EXPORT_FOLDER, 'user_exported_{}', 'compressed_{}').format(request.user.id,
+                                                                                        request.user.id),
+                'zip',
+                os.path.join(EXPORT_FOLDER, 'user_{}').format(request.user.id)
+            )
+            zip_file = open(
+                os.path.join(EXPORT_FOLDER, 'user_exported_{}', 'compressed_{}.zip').format(request.user.id,
+                                                                                            request.user.id), 'rb')
+            response = HttpResponse(zip_file, content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename=name.zip'
+
+            return response
+        else:
+            return JsonResponse({"intents": "No intent to export."})
+
+
+class ImportIntentManager(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated, permissions.IntentPermissions)
+    serializer_class = serializers.IntentManagerSerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        {"zip_file":file}
+        """
+        user_id = request.user.id
+        agent_id = self.kwargs['agentid']
+        try:
+            Agent.objects.get(id=agent_id)
+        except Agent.DoesNotExist:
+            return JsonResponse({"error": "agent not found."})
+        # 1) read zip file and extract its content:
+        try:
+            zip_file = request.FILES["zip_file"]
+        except:
+            return JsonResponse({"error": "Expected zip_file."})
+        path_to_user_folder = os.path.join(IMPORT_FOLDER, 'user_{}').format(user_id)
+        try:
+            shutil.rmtree(path_to_user_folder)
+        except:
+            os.makedirs(path_to_user_folder)
+
+        # 2) extract zip file and import data to database
+        zip_ref = zipfile.ZipFile(zip_file, 'r')
+        zip_ref.extractall(path_to_user_folder)
+        zip_ref.close()
+
+        """ load intents.json file """
+        try:
+            intents_file = open(os.path.join(path_to_user_folder, 'intents.json'))
+        except:
+            return JsonResponse({"erreur": "Fichier intents.json non trouvé."})
+
+        try:
+            intents = json.load(intents_file)["Intents"]
+        except:
+            return JsonResponse({"erreur": "Fichier intents.json ne peut pas etre chargé correctement."})
+
+        for intent in intents:
+            serializer = serializers.IntentManagerSerializer(data=intent,
+                                                             context={'request': self.request,
+                                                                      'agentid': self.kwargs['agentid'],
+                                                                      'path_to_user_folder': path_to_user_folder})
+            if serializer.is_valid():
+                serializer.create(intent)
+            else:
+                raise ValidationError(serializer.error_messages)
+
+        return JsonResponse({"success": "OK"})
+
+
+class ExportAgentsManager(APIView):
+    # renderer_classes = [ZIPRenderer, JSONRenderer, BrowsableAPIRenderer]
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = export_serializers.AgentManagerSerializer
+    renderer_classes = [ZIPRenderer, JSONRenderer, BrowsableAPIRenderer]
+
+
+    #TODO: Add permission class for agent export class
+
+    def post(self, request):
+        """
+        {"agents_list":[agentID,...]}
+        cant export one or many agents
+
+        """
+        print(request.data)
+        try:
+            list_ids = request.data["agents_list"]
+        except:
+            return JsonResponse({"error": "Expected agents_list."})
+
+        if type(list_ids) != list:
+            return JsonResponse({"error": "Input expected to be list."})
+
+        if len(list_ids) > 0:
+            # 0) check if agent ids exist
+            # 1) check agent permissions
+            permissions = UserPermissions.objects.filter(user_profile=self.request.user, is_active=True).values('agent')
+            agents = Agent.objects.filter(id__in=permissions)
+            agents_ids = [agent.id for agent in agents]
+            for agent_id in list_ids:
+                try:
+                    Agent.objects.get(id=agent_id)
+                except Agent.DoesNotExist:
+                    return JsonResponse({"error": "Agent with id " + str(agent_id) + " does not exist."})
+
+                if not agent_id in agents_ids:
+                    return JsonResponse({"error": "Vous n'avez pas les permissions pour exporter le (ou les) agents demandé(s)"})
+
+            # 1) empty working directory to receive new exported data:
+            path_to_user_folder = os.path.join(EXPORT_FOLDER, 'user_{}').format(request.user.id)
+
+            if not os.path.exists(path_to_user_folder):
+                os.makedirs(path_to_user_folder)
+            else:
+                shutil.rmtree(path_to_user_folder)
+                os.makedirs(path_to_user_folder)
+
+            path = os.path.join(path_to_user_folder, "agents.json")
+
+            # 2) export agents
+            queryset = Agent.objects.filter(id__in=list_ids)
+            serializer = self.serializer_class(queryset, many=True)
+            with open(path, 'w') as agents_file:
+                json.dump({"Agents": serializer.data}, agents_file, ensure_ascii=False, indent=4)
+
+
+            # 4) collect images related to agents
+
+            images_path = os.path.join(path_to_user_folder, 'images')
+            # create images folder if it does not exist
+            if not os.path.exists(images_path):
+                os.makedirs(images_path)
+            else:
+                shutil.rmtree(images_path)
+                os.makedirs(images_path)
+
+            for agent in queryset:
+                try:
+                    image_name = os.path.join(images_path, '{}').format(agent.imagename())
+                    with open(image_name, 'wb') as actual_file:
+                        actual_file.write(agent.image.read())
+                except:
+                    pass
+
+            # get intent ids
+            intents_list = Intent.objects.filter(agent__in=queryset)
+            block_responses = BlockResponse.objects.filter(intent__in=intents_list, is_complex=True)
+            if len(block_responses) > 0:
+                mixed_responses = MixedResponse.objects.filter(block_response__in=block_responses)
+                images_set = Image.objects.filter(mixed_response__in=mixed_responses)
+                if len(images_set) > 0:
+                    for image in images_set:
+                        try:
+                            image_name = os.path.join(images_path, '{}').format(image.imagename())
+                            with open(image_name, 'wb') as actual_file:
+                                actual_file.write(image.image.read())
+                        except:
+                            pass
+                """ filtering sliders image """
+                gallery_set = Gallery.objects.filter(mixed_response__in=mixed_responses)
+                if len(gallery_set) > 0:
+                    slider_set = Slider.objects.filter(gallery__in=gallery_set)
+                    if len(slider_set) > 0:
+                        for slider in slider_set:
+                            try:
+                                image_name = os.path.join(images_path, '{}').format(slider.imagename())
+                                with open(image_name, 'wb') as actual_file:
+                                    actual_file.write(slider.image.read())
+                            except:
+                                pass
+            # 3) generate zip_file:
+            try:
+                shutil.rmtree(os.path.join(EXPORT_FOLDER, 'user_exported_{}').format(request.user.id))
+            except:
+                pass
+            shutil.make_archive(
+                os.path.join(EXPORT_FOLDER, 'user_exported_{}', 'compressed_{}').format(request.user.id,
+                                                                                        request.user.id),
+                'zip',
+                os.path.join(EXPORT_FOLDER, 'user_{}').format(request.user.id)
+            )
+            zip_file = open(
+                os.path.join(EXPORT_FOLDER, 'user_exported_{}', 'compressed_{}.zip').format(request.user.id,
+                                                                                            request.user.id), 'rb')
+            response = HttpResponse(zip_file, content_type='application/zip')
+            response['Content-Disposition'] = 'attachment; filename=name.zip'
+
+            return response
+        else:
+            return JsonResponse({"agents": "No agents to export."})
+
+
+class ImportAgentsManager(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    #TODO: Add permission class for agent import class
+
+    def post(self, request):
+        """
+        {"zip_file":file}
+        """
+
+        # 1) read zip file and extract its content:
+        try:
+            zip_file = request.FILES["zip_file"]
+        except:
+            return JsonResponse({"error": "Expected zip_file."})
+
+        path_to_user_folder = os.path.join(IMPORT_FOLDER, 'user_{}').format(request.user.id)
+        try:
+            shutil.rmtree(path_to_user_folder)
+        except:
+            os.makedirs(path_to_user_folder)
+
+        # 2) extract zip file and import data to database
+        zip_ref = zipfile.ZipFile(zip_file, 'r')
+        zip_ref.extractall(path_to_user_folder)
+        zip_ref.close()
+
+        """ load agents.json file """
+        try:
+            agents_file = open(os.path.join(path_to_user_folder, 'agents.json'))
+        except:
+            return JsonResponse({"erreur": "Fichier agents.json non trouvé."})
+
+        try:
+            agents = json.load(agents_file)["Agents"]
+        except:
+            return JsonResponse({"erreur": "Fichier agents.json ne peut pas etre chargé correctement."})
+
+        for agent in agents:
+            serializer = serializers.AgentManagerSerializer(data=agent,
+                                                            context={'request': self.request,
+                                                                     'path_to_user_folder': path_to_user_folder})
+            if serializer.is_valid():
+                serializer.create(agent)
+            else:
+                raise ValidationError(serializer.error_messages)
+
+        return JsonResponse({"success": "OK"})
+
+
+class RestoreAgentManager(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    # TODO: class not yet tested
+    # TODO: Add permission class for agent export class
+
+    def post(self, request):
+        """
+        {"zip_file":file,
+        "agent_id": agentID}
+        """
+        # 1) read zip file and extract its content:
+        try:
+            zip_file = request.FILES["zip_file"]
+        except:
+            return JsonResponse({"error": "Expected zip_file."})
+        try:
+            agent_id = request.data["agent_id"]
+        except:
+            return JsonResponse({"error": "Expected agent_id."})
+
+        print("type agent_id", type(agent_id))
+        if type(agent_id) != str:
+            return JsonResponse({"error": "Expected integer."})
+        try:
+            agent = Agent.objects.get(id=agent_id)
+        except:
+            return JsonResponse({"error": "Agent not found "+str(agent_id)})
+
+        path_to_user_folder = os.path.join(IMPORT_FOLDER, 'user_{}').format(request.user.id)
+        try:
+            shutil.rmtree(path_to_user_folder)
+        except:
+            os.makedirs(path_to_user_folder)
+
+        # 2) extract zip file and import data to database
+        zip_ref = zipfile.ZipFile(zip_file, 'r')
+        zip_ref.extractall(path_to_user_folder)
+        zip_ref.close()
+
+        """ load agents.json file """
+        agents_file = open(os.path.join(path_to_user_folder, 'agents.json'))
+        try:
+            agents = json.load(agents_file)["Agents"]
+        except:
+            return JsonResponse({"error": "Problème lors de la lecture du fichier agents.json"})
+
+        if len(agents) > 1:
+            return JsonResponse({"error": "Le fichier agents.json contient plus qu'un agent."})
+        if len(agents) == 0:
+            return JsonResponse({"error": "Aucun agent trouvé dans le fichier agents.json."})
+
+        if len(agents) == 1:
+            serializer = serializers.AgentManagerSerializer(data=agents[0],
+                                                            context={'request': self.request,
+                                                                     'path_to_user_folder': path_to_user_folder})
+            if serializer.is_valid():
+                # delete intents related to this agent
+                intents = Intent.objects.filter(agent=agent_id)
+                for intent in intents:
+                    intent.delete()
+                serializer.update(agent, agents[0])
+            else:
+                raise ValidationError(serializer.error_messages)
+
+        return JsonResponse({"success": "OK"})
+
+
+class AddQuestionToIntents(viewsets.ModelViewSet):
+
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = serializers.AddQuestionToIntent
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+
+        serializer = self.serializer_class(data=request.data, context={'request': self.request})
+
+        if serializer.is_valid():
+            #agent = serializer.save()
+
+            return Response({"success": True})
+        return Response({"success": False})
